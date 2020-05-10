@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  description: Order Risk Assessment API
+  version: "0.1.0"
+  title: Order Risk Assessment API
+  contact:
+    email: luizinhoab@gmail.com
+  license:
+    name: MIT
+    url: 'https://opensource.org/licenses/MIT'
+tags:
+  - name: risk
+    description: Every resources to interact with order risk assessment
+paths:
+  /risk/assessment:
+    post:
+      tags:
+        - risk
+      summary: Create and verify a risk for order
+      description: |
+        - Order risk asessment
+        - Save risk asessment
+      operationId: risk-assessment
+      requestBody:
+        $ref: '#/components/requestBodies/risk'
+      responses:
+        '200':
+          description: Returned whether tweet created or exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assessment'
+        '400':
+          description: Returned when request will invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                id: 3d0ca315-aff9–4fc2-be61–3b76b9a2d798
+                status: 400
+                message: Some invalid request message
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: integer
+          format: int32
+        message:
+          type: string
+    Risk:
+      type: object
+      properties:
+        order_number:
+          type: string
+          format: int32
+          required: true
+        customer_id:
+          type: string
+          format: uuid
+        customer_name:
+          type: string
+          required: true
+        customer_cpf:
+          type: string
+          maxLength: 11
+          minLength: 11
+          required: true
+        card_holder_name:
+          type: string
+          required: true
+        card_number:
+          type: string
+          required: true
+        expires:
+          type: string
+          minLength: 4
+          maxLength: 4
+          required: true
+        flag:
+          type: string
+          required: true
+        creation_order_date:
+          type: string
+          format: 'date-time'
+          required: true
+    Assessment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        risk:
+          $ref: '#/components/schemas/Risk'
+        status:
+          type: string
+        motivation:
+          type: string
+        create_at:
+          type: string
+          format: 'date-time'
+        update_at:
+          type: string
+          format: 'date-time'
+
+  requestBodies:
+    risk:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Risk'
