@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+    postgres-risk:
+      image: postgres:9.6.17-alpine
+      restart: always
+      ports:
+        - 5433:5432
+      environment:
+        POSTGRES_DB: risk-db
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: 4dm1n
+      networks:
+        - risk-db-net
+
+    pgadmin:
+      image: dpage/pgadmin4
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin
+        PGADMIN_DEFAULT_PASSWORD: 4dm1n
+      ports:
+        - 8080:80
+      depends_on:
+        - postgres-risk
+      networks:
+        - risk-db-net
+
+networks:
+  risk-db-net:
+    driver: bridge
+
