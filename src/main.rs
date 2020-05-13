@@ -1,12 +1,27 @@
 #[macro_use]
 extern crate log;
+
+#[cfg(test)]
+#[macro_use]
+extern crate lazy_static;
+#[cfg(test)]
+#[macro_use]
+extern crate diesel_migrations;
+
 use dotenv::dotenv;
 
-mod interface{
+mod interface {
     pub mod api_server;
     pub mod operation_handlers;
 }
 
+mod infra {
+    pub mod database;
+    pub mod risk_postgres;
+}
+mod schema;
+
+#[cfg_attr(tarpaulin, skip)]
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -14,5 +29,4 @@ async fn main() -> std::io::Result<()> {
     info!("Starting order-risk-assessment-ms ...");
 
     interface::api_server::create_server().await
-
 }
