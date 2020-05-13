@@ -19,6 +19,7 @@ mod infra {
     pub mod database;
     pub mod risk_postgres;
 }
+mod schema;
 
 #[cfg_attr(tarpaulin, skip)]
 #[actix_rt::main]
