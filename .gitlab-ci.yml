@@ -1,16 +1,20 @@
-image: "rust:latest"
+default:
+  image: "rust:latest"
+  variables:
+    CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  cache:
+    paths:
+      - .cargo
 
-variables:
-  CARGO_HOME: $CI_PROJECT_DIR/cargo
-
-before_script:
-  - wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.4.linux-amd64.tgz | tar -xvz
-  - cp -i cockroach-v19.1.4.linux-amd64/cockroach /usr/local/bin
+stages:
+  - test
 
 test:cargo:
+  stage: test
+  before_script:
+    - wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.4.linux-amd64.tgz | tar -xvz
+    - cp -i cockroach-v19.1.4.linux-amd64/cockroach /usr/local/bin
   script:
     - rustc --version && cargo --version
     - cargo test --all --verbose
-  cache:
-    paths:
-      - cargo/
+
