@@ -1,10 +1,11 @@
 default:
   image: "rust:latest"
-  variables:
-    CARGO_HOME: $CI_PROJECT_DIR/.cargo
   cache:
     paths:
       - .cargo
+      -
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/.cargo
 
 stages:
   - test
@@ -17,4 +18,3 @@ test:cargo:
   script:
     - rustc --version && cargo --version
     - cargo test --all --verbose
-
