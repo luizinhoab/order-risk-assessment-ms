@@ -20,4 +20,6 @@ test:cargo:
     - cargo install cargo-tarpaulin -f
   script:
     - rustc --version && cargo --version
-    - cargo tarpaulin -v
+    - cargo test --all --verbose --release
+  only:
+    - development
