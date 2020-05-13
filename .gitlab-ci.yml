@@ -3,7 +3,7 @@ default:
   cache:
     paths:
       - .cargo
-      -
+
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/.cargo
 
