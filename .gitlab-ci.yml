@@ -15,6 +15,7 @@ test:cargo:
   before_script:
     - wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.4.linux-amd64.tgz | tar -xvz
     - cp -i cockroach-v19.1.4.linux-amd64/cockroach /usr/local/bin
+    - cargo install cargo-tarpaulin -f
   script:
     - rustc --version && cargo --version
-    - cargo test --all --verbose
+    - cargo tarpaulin -v
