@@ -59,7 +59,7 @@ mod tests {
     use crate::app::domain::models::Risk;
     use std::env::set_var;
     use tempdb_cockroach::TempCockroach;
-    use uuid::Uuid;
+
     embed_migrations!();
 
     lazy_static! {
