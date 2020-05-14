@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate log;
-
 #[cfg(test)]
 #[macro_use]
 extern crate lazy_static;
@@ -12,12 +11,20 @@ extern crate diesel_migrations;
 
 use dotenv::dotenv;
 
+mod app {
+    pub mod domain {
+        pub mod models;
+        pub mod repository;
+    }
+}
+
 mod interface {
     pub mod api_server;
     pub mod operation_handlers;
 }
 
 mod infra {
+    pub mod assesment_mapper;
     pub mod database;
     pub mod risk_postgres;
 }
