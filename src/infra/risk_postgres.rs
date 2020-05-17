@@ -1,53 +1,32 @@
 use crate::app::domain::models::Assessment;
 use crate::app::domain::repository::Repository;
-use crate::infra::assesment_mapper::AssessmentEntity;
-use crate::infra::database::DbClient;
+use crate::errors::CustomError;
+use crate::infra::entities::AssessmentEntity;
 use crate::schema::assessment;
 use diesel::r2d2::ConnectionManager;
 use diesel::{insert_into, PgConnection, RunQueryDsl};
-use std::env::var;
-use std::io::Error;
 
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
+#[derive(Clone)]
 pub struct RiskDieselPg {
-    pool: Option<Pool>,
+    pub pool: Pool,
 }
 
 impl RiskDieselPg {
-    pub fn new(&self) -> Self {
-        Self {
-            pool: Option::from(self.init_pool()),
-        }
+    pub fn new(pool: Pool) -> Self {
+        Self { pool }
     }
 }
 
-impl DbClient<Pool> for RiskDieselPg {
-    fn init_pool(&self) -> Pool {
-        let database_url =
-            var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
-
-        let manager = ConnectionManager::new(database_url);
-
-        r2d2::Pool::builder()
-            .build(manager)
-            .expect("Failed to create pool")
-    }
-}
-
-impl Repository<Assessment, Error> for RiskDieselPg {
-    fn save(&self, object: Assessment) -> Result<Assessment, Error> {
-        let conn = &self
-            .pool
-            .as_ref()
-            .unwrap()
-            .try_get()
-            .expect("Pool unreached for operation");
-
+impl Repository<Assessment, CustomError> for RiskDieselPg {
+    fn save(&self, object: Assessment) -> Result<Assessment, CustomError> {
+        let conn = &self.pool.try_get().expect("Pool unreached for operation");
+        let entity = AssessmentEntity::map_to_insert(object);
         let result = insert_into(assessment::table)
-            .values(AssessmentEntity::map_to_insert(object))
+            .values(&entity)
             .get_result::<AssessmentEntity>(conn)
-            .expect("Cannot insert Assesment");
+            .expect("");
 
         Ok(AssessmentEntity::map_from_db(result))
     }
@@ -57,7 +36,7 @@ impl Repository<Assessment, Error> for RiskDieselPg {
 mod tests {
     use super::*;
     use crate::app::domain::models::Risk;
-    use std::env::set_var;
+    use std::env::{set_var, var};
     use tempdb_cockroach::TempCockroach;
 
     embed_migrations!();
@@ -82,43 +61,29 @@ mod tests {
     }
 
     #[test]
-    fn given_risk_diesel_pg_when_pool_none_call_new_expect_some_pool() {
-        set_var("DATABASE_URL", String::from(DB.url()));
-        let risk_postgres = RiskDieselPg { pool: None }.new();
-
-        assert!(
-            risk_postgres.pool.is_some(),
-            "given RiskDieselPg when pool is none and environment was configured expect some poll"
-        );
-    }
-
-    #[test]
-    fn given_risk_diesel_pg_when_pool_referenced_expect_some_pool() {
+    fn given_risk_diesel_pg_when_new_expect_get_ok() {
         set_var("DATABASE_URL", String::from(DB.url()));
         let database_url =
             var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
         let manager = ConnectionManager::<PgConnection>::new(database_url);
-        let risk_postgres = RiskDieselPg {
-            pool: Option::from(r2d2::Pool::builder().build(manager).unwrap()),
-        };
+        let pool = r2d2::Pool::builder().build(manager).unwrap();
+        let risk_postgres = RiskDieselPg::new(pool);
 
         assert!(
-            risk_postgres.pool.is_some(),
+            risk_postgres.pool.get().is_ok(),
             "given RiskDieselPg when pool referenced expect some poll"
         );
     }
 
     #[test]
-    #[should_panic(expected = "Failed to create pool")]
-    fn given_risk_diesel_pg_postgres_when_environment_var_empty_pool_referenced_expect_panic() {
-        set_var("DATABASE_URL", String::from(""));
-        let risk_postgres = RiskDieselPg { pool: None }.new();
-    }
-
-    #[test]
     fn given_risk_diesel_pg_when_save_new_assessment_expect_ok() {
         set_var("DATABASE_URL", String::from(DB.url()));
-        let risk_postgres = RiskDieselPg { pool: None }.new();
+        let database_url =
+            var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
+        let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let pool = r2d2::Pool::builder().build(manager).unwrap();
+        let risk_postgres = RiskDieselPg::new(pool);
+
         let assessment = Assessment {
             id: None,
             risk: Risk {
