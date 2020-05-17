@@ -1,8 +1,7 @@
 use chrono::NaiveDateTime;
-use diesel::pg::data_types::Cents;
 use uuid::Uuid;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Risk {
     pub order_number: i64,
     pub customer_id: Option<Uuid>,
@@ -14,7 +13,7 @@ pub struct Risk {
     pub creation_date_order: NaiveDateTime,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Assessment {
     pub id: Option<Uuid>,
     pub risk: Risk,
