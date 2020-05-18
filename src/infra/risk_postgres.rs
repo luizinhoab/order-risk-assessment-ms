@@ -1,40 +1,44 @@
-use crate::infra::database::DbClient;
+use crate::app::domain::models::Assessment;
+use crate::app::domain::repository::Repository;
+use crate::errors::CustomError;
+use crate::infra::entities::AssessmentEntity;
+use crate::schema::assessment;
 use diesel::r2d2::ConnectionManager;
-use diesel::PgConnection;
-use std::env::var;
+use diesel::{insert_into, PgConnection, RunQueryDsl};
 
-pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
+#[derive(Clone)]
 pub struct RiskDieselPg {
-    pool: Option<Pool>,
+    pub pool: Pool,
 }
 
 impl RiskDieselPg {
-    pub fn new(&self) -> Self {
-        Self {
-            pool: Option::from(self.init_pool()),
-        }
+    pub fn new(pool: Pool) -> Self {
+        Self { pool }
     }
 }
 
-impl DbClient<Pool> for RiskDieselPg {
-    fn init_pool(&self) -> Pool {
-        let database_url =
-            var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
+impl Repository<Assessment, CustomError> for RiskDieselPg {
+    fn save(&self, object: Assessment) -> Result<Assessment, CustomError> {
+        let conn = &self.pool.try_get().expect("Pool unreached for operation");
+        let entity = AssessmentEntity::map_to_insert(object);
+        let result = insert_into(assessment::table)
+            .values(&entity)
+            .get_result::<AssessmentEntity>(conn)
+            .expect("");
 
-        let manager = ConnectionManager::new(database_url);
-
-        r2d2::Pool::builder()
-            .build(manager)
-            .expect("Failed to create pool")
+        Ok(AssessmentEntity::map_from_db(result))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::env::set_var;
+    use crate::app::domain::models::Risk;
+    use std::env::{set_var, var};
     use tempdb_cockroach::TempCockroach;
+
     embed_migrations!();
 
     lazy_static! {
@@ -57,33 +61,48 @@ mod tests {
     }
 
     #[test]
-    fn given_tweetx_postgres_when_pool_none_call_new_expect_some_pool() {
-        set_var("DATABASE_URL", String::from(DB.url()));
-        let tweetx_postgres = RiskDieselPg { pool: None }.new();
-
-        assert!(tweetx_postgres.pool.is_some(), "given TweetxPostgres when pool is none and environment was configured expect some poll");
-    }
-
-    #[test]
-    fn given_tweetx_postgres_when_pool_referenced_expect_some_pool() {
+    fn given_risk_diesel_pg_when_new_expect_get_ok() {
         set_var("DATABASE_URL", String::from(DB.url()));
         let database_url =
             var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
         let manager = ConnectionManager::<PgConnection>::new(database_url);
-        let tweetx_postgres = RiskDieselPg {
-            pool: Option::from(r2d2::Pool::builder().build(manager).unwrap()),
-        };
+        let pool = r2d2::Pool::builder().build(manager).unwrap();
+        let risk_postgres = RiskDieselPg::new(pool);
 
         assert!(
-            tweetx_postgres.pool.is_some(),
-            "given TweetxPostgres when pool referenced expect some poll"
+            risk_postgres.pool.get().is_ok(),
+            "given RiskDieselPg when pool referenced expect some poll"
         );
     }
 
     #[test]
-    #[should_panic(expected = "Failed to create pool")]
-    fn given_tweetx_postgres_when_pool_referenced_expect_panic() {
-        set_var("DATABASE_URL", String::from(""));
-        let tweetx_postgres = RiskDieselPg { pool: None }.new();
+    fn given_risk_diesel_pg_when_save_new_assessment_expect_ok() {
+        set_var("DATABASE_URL", String::from(DB.url()));
+        let database_url =
+            var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
+        let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let pool = r2d2::Pool::builder().build(manager).unwrap();
+        let risk_postgres = RiskDieselPg::new(pool);
+
+        let assessment = Assessment {
+            id: None,
+            risk: Risk {
+                order_number: 1,
+                customer_id: None,
+                customer_name: "Linus Torvalds".to_string(),
+                customer_cpf: "00000000000".to_string(),
+                card_number: "4444333322221111".to_string(),
+                card_holder_name: "Linus Torvalds".to_string(),
+                value: 45.20,
+                creation_date_order: chrono::Local::now().naive_local()
+                    + chrono::Duration::hours(24),
+            },
+            status: "APPROVED".to_string(),
+            motivation: None,
+            create_at: None,
+            update_at: None,
+        };
+
+        assert!(risk_postgres.save(assessment).is_ok());
     }
 }

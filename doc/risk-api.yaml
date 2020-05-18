@@ -78,13 +78,14 @@ components:
         card_number:
           type: string
           required: true
-        expires:
+        value:
+          type: number
+          format: double
+          required: true
+        card_expiration:
           type: string
           minLength: 4
           maxLength: 4
-          required: true
-        flag:
-          type: string
           required: true
         creation_order_date:
           type: string
