@@ -14,8 +14,6 @@ use validator::Validate;
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 fn init_service(pool: &Pool) -> RiskService {
-    let database_url = var("DATABASE_URL").expect("DATABASE_URL environment variable not found");
-    let manager = ConnectionManager::<PgConnection>::new(database_url);
     let repository = Box::new(RiskDieselPg::new(pool.clone()));
     RiskService::new(repository)
 }
