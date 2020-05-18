@@ -1,9 +1,10 @@
 use super::operation_handlers as handlers;
-use crate::interface::operation_handlers::Pool;
 use actix_web::{middleware, web, App, HttpServer};
 use diesel::r2d2::ConnectionManager;
 use diesel::PgConnection;
 use std::env::var;
+
+type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 pub async fn init_app(pool: Pool) -> std::io::Result<()> {
     let host = var("SERVER_HOST").unwrap_or_else(|_| String::from("localhost"));

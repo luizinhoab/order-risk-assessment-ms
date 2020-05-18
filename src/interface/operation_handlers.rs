@@ -7,11 +7,10 @@ use actix_web::web::Data;
 use actix_web::{post, web, HttpRequest, HttpResponse, Result};
 use diesel::r2d2::ConnectionManager;
 use diesel::PgConnection;
-use std::env::var;
 use std::path::PathBuf;
 use validator::Validate;
 
-pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 fn init_service(pool: &Pool) -> RiskService {
     let repository = Box::new(RiskDieselPg::new(pool.clone()));
@@ -24,7 +23,7 @@ pub async fn handle_assessment_risk(
 ) -> Result<HttpResponse, CustomError> {
     document.validate()?;
     let risk_service = init_service(&pool);
-    let risk = document.mapToDomain();
+    let risk = document.map_to_domain();
 
     let result = web::block(move || risk_service.assess_risk(risk))
         .await

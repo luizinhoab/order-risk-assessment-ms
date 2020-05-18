@@ -13,11 +13,9 @@ extern crate validator;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
-use crate::infra::risk_postgres::RiskDieselPg;
 use diesel::r2d2::ConnectionManager;
 use diesel::PgConnection;
-use dotenv::{dotenv, var};
-use std::borrow::Borrow;
+use dotenv::dotenv;
 
 mod app {
     pub mod domain {

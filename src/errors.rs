@@ -1,4 +1,3 @@
-use actix_web::error::BlockingError;
 use actix_web::{HttpResponse, ResponseError};
 use derive_more::Display;
 use diesel::result::Error;
@@ -15,9 +14,6 @@ pub enum CustomError {
 
     #[display(fmt = "Bad Request: {}", _0)]
     ValidationError(String),
-
-    #[display(fmt = "Unauthorized")]
-    Unauthorized,
 }
 
 impl ResponseError for CustomError {
@@ -25,7 +21,6 @@ impl ResponseError for CustomError {
         match self {
             CustomError::IntegrationError(ref message) => HttpResponse::BadGateway().json(message),
             CustomError::ValidationError(ref message) => HttpResponse::BadRequest().json(message),
-            CustomError::Unauthorized => HttpResponse::Unauthorized().json("Unauthorized"),
             _ => {
                 HttpResponse::InternalServerError().json("Internal Server Error, Please try later")
             }

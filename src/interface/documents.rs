@@ -1,7 +1,7 @@
 use crate::app::domain::models::Risk;
 use regex::Regex;
 use uuid::Uuid;
-use validator::{Validate, ValidationError};
+use validator::Validate;
 
 lazy_static! {
     static ref ISO8601: Regex = Regex::new(r"^([1][9][0-9]{2}|[2][0-9]{3})-([1-9]|([0][1-9]|[1][0-2]))-(([0][1-9]|[1][0-9]|[2][0-9]|[3][0-1])) (\d{2}):(\d{2}):(\d{2})$").unwrap();
@@ -26,7 +26,7 @@ pub struct RiskRequestBody {
 }
 
 impl RiskRequestBody {
-    pub fn mapToDomain(&self) -> Risk {
+    pub fn map_to_domain(&self) -> Risk {
         Risk {
             order_number: self.order_number,
             customer_id: self.customer_id,

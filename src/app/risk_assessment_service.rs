@@ -1,8 +1,6 @@
 use crate::app::domain::models::{Assessment, Risk};
 use crate::app::domain::repository::Repository;
 use crate::errors::CustomError;
-use actix_web::{HttpResponse, ResponseError};
-use diesel::result::{DatabaseErrorKind, Error as DBError};
 
 pub struct RiskService {
     repository: Box<dyn Repository<Assessment, CustomError> + Send + Sync>,

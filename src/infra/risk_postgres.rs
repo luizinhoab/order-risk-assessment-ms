@@ -6,7 +6,7 @@ use crate::schema::assessment;
 use diesel::r2d2::ConnectionManager;
 use diesel::{insert_into, PgConnection, RunQueryDsl};
 
-pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 #[derive(Clone)]
 pub struct RiskDieselPg {
