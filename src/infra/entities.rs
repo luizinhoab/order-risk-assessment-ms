@@ -1,32 +1,31 @@
 use super::super::schema::assessment;
 use crate::app::domain::models::{Assessment, Risk};
 use chrono::NaiveDateTime;
-use diesel::pg::data_types::Cents;
 use uuid::Uuid;
 
-#[derive(Debug, Insertable, Queryable)]
+#[derive(Debug, Deserialize, Insertable, Queryable)]
 #[table_name = "assessment"]
 pub struct AssessmentEntity {
-    id: Uuid,
-    order_number: i64,
-    customer_id: Option<Uuid>,
-    customer_name: String,
-    customer_cpf: String,
-    card_number: String,
-    card_holder_name: String,
-    creation_date_order: NaiveDateTime,
-    value: f64,
-    status: String,
-    motivation: Option<String>,
-    create_at: NaiveDateTime,
-    update_at: Option<NaiveDateTime>,
+    pub id: Uuid,
+    pub order_number: i32,
+    pub customer_id: Option<Uuid>,
+    pub customer_name: String,
+    pub customer_cpf: String,
+    pub card_number: String,
+    pub card_holder_name: String,
+    pub creation_date_order: NaiveDateTime,
+    pub value: f32,
+    pub status: String,
+    pub motivation: Option<String>,
+    pub create_at: NaiveDateTime,
+    pub update_at: Option<NaiveDateTime>,
 }
 
 impl AssessmentEntity {
     pub fn map_to_insert(ass: Assessment) -> Self {
         Self {
             id: Uuid::new_v4(),
-            order_number: ass.risk.order_number,
+            order_number: i32::from(ass.risk.order_number),
             customer_id: ass.risk.customer_id,
             customer_name: ass.risk.customer_name,
             customer_cpf: ass.risk.customer_cpf,

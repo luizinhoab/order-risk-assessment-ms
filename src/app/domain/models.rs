@@ -3,13 +3,13 @@ use uuid::Uuid;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct Risk {
-    pub order_number: i64,
+    pub order_number: i32,
     pub customer_id: Option<Uuid>,
     pub customer_name: String,
     pub customer_cpf: String,
     pub card_number: String,
     pub card_holder_name: String,
-    pub value: f64,
+    pub value: f32,
     pub creation_date_order: NaiveDateTime,
 }
 
