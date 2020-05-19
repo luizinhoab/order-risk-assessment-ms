@@ -70,7 +70,7 @@ mod tests {
         };
 
         mock.expect_save()
-            .returning(|x| Err(CustomError::InternalServerError));
+            .returning(|_| Err(CustomError::InternalServerError));
 
         let service = RiskService {
             repository: Box::new(mock),
