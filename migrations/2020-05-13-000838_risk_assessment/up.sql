@@ -1,6 +1,6 @@
 CREATE TABLE assessment (
     id UUID PRIMARY KEY,
-    order_number INTEGER NOT NULL,
+    order_number INT4 NOT NULL,
     customer_id UUID,
     customer_name TEXT NOT NULL,
     customer_cpf VARCHAR(11) NOT NULL,
