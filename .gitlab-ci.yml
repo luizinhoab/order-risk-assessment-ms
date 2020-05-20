@@ -18,6 +18,7 @@ test:tarpaulin:
     - wget -qO- https://binaries.cockroachdb.com/cockroach-v20.1.0.linux-amd64.tgz | tar -xvz
     - cp -i cockroach-v20.1.0.linux-amd64/cockroach /usr/local/bin
     - cargo install cargo-tarpaulin -f
+    - sccache -s
   script:
     - rustc --version && cargo --version
     - cargo tarpaulin -v
@@ -34,6 +35,7 @@ test:cargo:
     - wget -qO- https://binaries.cockroachdb.com/cockroach-v20.1.0.linux-amd64.tgz | tar -xvz
     - cp -i cockroach-v20.1.0.linux-amd64/cockroach /usr/local/bin
     - cargo install cargo-tarpaulin -f
+    - sccache -s
   script:
     - rustc --version && cargo --version
     - cargo test --verbose
