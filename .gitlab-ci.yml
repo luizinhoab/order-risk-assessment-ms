@@ -40,6 +40,5 @@ test:cargo:
     - rustc --version && cargo --version
     - cargo test --verbose
   only:
-    - feature/*
-    - bugfix/*
+   - /^(feature|bugfix|hotfix)\/\d+-\w+/
 
