@@ -1,7 +1,7 @@
 use crate::app::domain::models::Assessment;
 use crate::app::domain::repository::Repository;
 use crate::errors::CustomError;
-use crate::infra::entities::AssessmentEntity;
+use crate::infra::db::entities::AssessmentEntity;
 use crate::schema::assessment;
 use diesel::r2d2::ConnectionManager;
 use diesel::{insert_into, PgConnection, RunQueryDsl};

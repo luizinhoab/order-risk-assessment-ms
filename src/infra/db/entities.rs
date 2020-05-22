@@ -1,5 +1,5 @@
-use super::super::schema::assessment;
 use crate::app::domain::models::{Assessment, Risk};
+use crate::schema::assessment;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
 
