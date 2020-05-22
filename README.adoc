@@ -39,7 +39,7 @@ Define enviroment variables host and port for application and run:
 
     export APP_HOST=0.0.0.0 ; export APP_PORT=8000
      OR
-    echo APP_HOST=0.0.0.0 \nAPP_PORT=8000> .env
+    echo APP_HOST=0.0.0.0 \nAPP_PORT=8000 \n RFP_BASE_URL=https://apigateway.serpro.gov.br/consulta-cpf-df-trial/v1/cpf/ \n RFP_API_TOKEN=4e1a1858bdd584fdc077fb7d80f39283 > .env
 
     cargo run
 
