@@ -22,3 +22,10 @@ pub struct Assessment {
     pub create_at: Option<NaiveDateTime>,
     pub update_at: Option<NaiveDateTime>,
 }
+
+pub struct IndividualTaxPayer {
+    pub number: String,
+    pub name: String,
+    pub situation_code: String,
+    pub situation_description: String,
+}
