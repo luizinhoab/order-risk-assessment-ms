@@ -19,6 +19,7 @@ use dotenv::dotenv;
 
 mod app {
     pub mod domain {
+        pub mod individual_tax_payer_service;
         pub mod models;
         pub mod repository;
     }
@@ -32,9 +33,15 @@ mod interface {
 }
 
 mod infra {
-    pub mod database;
-    pub mod entities;
-    pub mod risk_postgres;
+    pub mod db {
+        pub mod entities;
+        pub mod risk_postgres;
+    }
+
+    pub mod http {
+        pub mod document;
+        pub mod rfb_client;
+    }
 }
 mod schema;
 
