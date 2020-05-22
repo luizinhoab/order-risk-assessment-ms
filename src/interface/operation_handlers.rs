@@ -1,6 +1,6 @@
 use crate::app::risk_assessment_service::RiskService;
 use crate::errors::CustomError;
-use crate::infra::risk_postgres::RiskDieselPg;
+use crate::infra::db::risk_postgres::RiskDieselPg;
 use crate::interface::documents::RiskRequestBody;
 use actix_files::NamedFile;
 use actix_web::web::Data;
