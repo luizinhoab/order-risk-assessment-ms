@@ -37,9 +37,9 @@ The username and password according with Postgres config on docker-compose-dev.y
 
 Define enviroment variables host and port for application and run:
 
-    export SERVER_HOST=0.0.0.0 ; export SERVER_PORT=8000
+    export APP_HOST=0.0.0.0 ; export APP_PORT=8000
      OR
-    echo SERVER_HOST=0.0.0.0 \nSERVER_PORT=8000> .env
+    echo APP_HOST=0.0.0.0 \nAPP_PORT=8000> .env
 
     cargo run
 
