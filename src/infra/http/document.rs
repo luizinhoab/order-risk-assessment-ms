@@ -1,4 +1,4 @@
-use crate::app::domain::models::IndividualTaxPayer;
+use crate::app::domain::models::{IndividualTaxPayer, IndividualTaxPayerSituations};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct CPFResponseBody {
@@ -15,10 +15,14 @@ pub struct SituationCPF {
 
 impl CPFResponseBody {
     pub fn map_to_domain(&self) -> IndividualTaxPayer {
+        let situation = match self.situacao.codigo.as_str() {
+            "0" | "4" => IndividualTaxPayerSituations::AUTHORIZED,
+            _ => IndividualTaxPayerSituations::UNAUTHORIZED,
+        };
         IndividualTaxPayer {
             number: self.ni.clone(),
             name: self.nome.clone(),
-            situation_code: self.situacao.codigo.clone(),
+            situation,
             situation_description: self.situacao.descricao.clone(),
         }
     }

@@ -6,7 +6,7 @@ use crate::schema::assessment;
 use diesel::r2d2::ConnectionManager;
 use diesel::{insert_into, PgConnection, RunQueryDsl};
 
-type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
+pub(crate) type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 #[derive(Clone)]
 pub struct RiskDieselPg {
@@ -35,7 +35,7 @@ impl Repository<Assessment, CustomError> for RiskDieselPg {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::app::domain::models::Risk;
+    use crate::app::domain::models::{AssessmentStatus, Risk};
     use std::env::{set_var, var};
     use tempdb_cockroach::TempCockroach;
 
@@ -97,7 +97,7 @@ mod tests {
                 creation_date_order: chrono::Local::now().naive_local()
                     + chrono::Duration::hours(24),
             },
-            status: "APPROVED".to_string(),
+            status: AssessmentStatus::APPROVED,
             motivation: None,
             create_at: None,
             update_at: None,

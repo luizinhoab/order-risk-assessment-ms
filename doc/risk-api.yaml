@@ -101,6 +101,7 @@ components:
           $ref: '#/components/schemas/Risk'
         status:
           type: string
+          enum: [APPROVED, ANALYZING, REPROVED]
         motivation:
           type: string
         create_at:

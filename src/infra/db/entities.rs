@@ -1,4 +1,4 @@
-use crate::app::domain::models::{Assessment, Risk};
+use crate::app::domain::models::{Assessment, AssessmentStatus, Risk};
 use crate::schema::assessment;
 use chrono::NaiveDateTime;
 use uuid::Uuid;
@@ -25,7 +25,7 @@ impl AssessmentEntity {
     pub fn map_to_insert(ass: Assessment) -> Self {
         Self {
             id: Uuid::new_v4(),
-            order_number: i32::from(ass.risk.order_number),
+            order_number: ass.risk.order_number,
             customer_id: ass.risk.customer_id,
             customer_name: ass.risk.customer_name,
             customer_cpf: ass.risk.customer_cpf,
@@ -33,7 +33,7 @@ impl AssessmentEntity {
             card_holder_name: ass.risk.card_holder_name,
             creation_date_order: ass.risk.creation_date_order,
             value: ass.risk.value,
-            status: ass.status,
+            status: ass.status.to_string(),
             motivation: ass.motivation,
             create_at: chrono::Local::now().naive_local() + chrono::Duration::hours(24),
             update_at: None,
@@ -53,7 +53,7 @@ impl AssessmentEntity {
                 value: ass.value,
                 creation_date_order: ass.creation_date_order,
             },
-            status: ass.status,
+            status: AssessmentStatus::from(ass.status),
             motivation: ass.motivation,
             create_at: Option::from(ass.create_at),
             update_at: ass.update_at,
