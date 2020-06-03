@@ -4,5 +4,6 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait IndividualTaxPayerService {
-    async fn find_payer_by_number(number: String) -> Result<IndividualTaxPayer, CustomError>;
+    async fn find_payer_by_number(&self, number: String)
+        -> Result<IndividualTaxPayer, CustomError>;
 }

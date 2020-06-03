@@ -1,25 +1,39 @@
 use crate::app::domain::individual_tax_payer_service::IndividualTaxPayerService;
-use crate::app::domain::models::IndividualTaxPayer;
+use crate::app::domain::models::{IndividualTaxPayer, IndividualTaxPayerSituations};
 use crate::errors::CustomError;
 use crate::infra::http::document::CPFResponseBody;
 use async_trait::async_trait;
 use reqwest::Client;
 use std::env::var;
 
-pub struct RFBClient;
+#[derive(Clone)]
+pub struct RFBClient {
+    url: String,
+    token: String,
+}
+
+impl RFBClient {
+    pub fn new() -> Self {
+        Self {
+            url: var("RFP_BASE_URL").expect("RFP_BASE_URL environment variable not found."),
+            token: var("RFP_API_TOKEN").expect("RFP_API_TOKEN environment variable not found."),
+        }
+    }
+}
 
 #[async_trait]
 impl IndividualTaxPayerService for RFBClient {
-    async fn find_payer_by_number(number: String) -> Result<IndividualTaxPayer, CustomError> {
-        let url = var("RFP_BASE_URL").expect("RFP_BASE_URL environment variable not found.");
-        let token = var("RFP_API_TOKEN").expect("RFP_API_TOKEN environment variable not found.");
-        let service_url = format!("{}{}", url, number);
+    async fn find_payer_by_number(
+        &self,
+        number: String,
+    ) -> Result<IndividualTaxPayer, CustomError> {
+        let service_url = format!("{}{}", &self.url, number);
 
         let client = Client::new();
 
         let result = client
             .get(service_url.as_str())
-            .header("Authorization", format!("Bearer {}", token))
+            .header("Authorization", format!("Bearer {}", &self.token))
             .send()
             .await?;
 
@@ -31,8 +45,8 @@ impl IndividualTaxPayerService for RFBClient {
             404 => Ok(IndividualTaxPayer {
                 number,
                 name: "".to_string(),
-                situation_code: "Nonexistent".to_string(),
-                situation_description: "".to_string(),
+                situation: IndividualTaxPayerSituations::NONEXISTENT,
+                situation_description: "CPF nonexistent".to_string(),
             }),
             _ => {
                 error!(
@@ -77,7 +91,11 @@ mod tests {
         set_var("RFP_BASE_URL", &**HOST_TEST);
         set_var("RFP_API_TOKEN", &**TOKEN_TEST);
 
-        let result = RFBClient::find_payer_by_number("63017285995".parse().unwrap()).await;
+        let client = RFBClient::new();
+
+        let result = client
+            .find_payer_by_number("63017285995".parse().unwrap())
+            .await;
 
         assert_eq!(mock.times_called(), 1);
         assert!(result.is_ok())
@@ -94,7 +112,10 @@ mod tests {
         set_var("RFP_BASE_URL", &**HOST_TEST);
         set_var("RFP_API_TOKEN", &**TOKEN_TEST);
 
-        let result = RFBClient::find_payer_by_number("63017285991".parse().unwrap()).await;
+        let client = RFBClient::new();
+        let result = client
+            .find_payer_by_number("63017285991".parse().unwrap())
+            .await;
 
         assert_eq!(mock.times_called(), 1);
         assert!(result.is_err())
@@ -111,7 +132,11 @@ mod tests {
         set_var("RFP_BASE_URL", &**HOST_TEST);
         set_var("RFP_API_TOKEN", &**TOKEN_TEST);
 
-        let result = RFBClient::find_payer_by_number("02401374000".parse().unwrap()).await;
+        let client = RFBClient::new();
+
+        let result = client
+            .find_payer_by_number("02401374000".parse().unwrap())
+            .await;
 
         assert_eq!(mock.times_called(), 1);
         assert!(result.is_ok())
