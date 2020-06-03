@@ -1,20 +1,20 @@
+use crate::app::domain::models::Assessment;
 use crate::app::risk_assessment_service::RiskService;
 use crate::errors::CustomError;
-use crate::infra::db::risk_postgres::RiskDieselPg;
+use crate::infra::db::risk_postgres::{Pool, RiskDieselPg};
+use crate::infra::http::rfb_client::RFBClient;
 use crate::interface::documents::RiskRequestBody;
 use actix_files::NamedFile;
 use actix_web::web::Data;
 use actix_web::{post, web, HttpRequest, HttpResponse, Result};
-use diesel::r2d2::ConnectionManager;
-use diesel::PgConnection;
 use std::path::PathBuf;
+use std::sync::Arc;
 use validator::Validate;
 
-type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
-
 fn init_service(pool: &Pool) -> RiskService {
-    let repository = Box::new(RiskDieselPg::new(pool.clone()));
-    RiskService::new(repository)
+    let repository = Arc::new(RiskDieselPg::new(pool.clone()));
+    let individual_payer_service = Arc::new(RFBClient::new());
+    RiskService::new(repository, individual_payer_service)
 }
 
 #[post("/risk/assessment")]
@@ -25,9 +25,7 @@ pub async fn handle_assessment_risk(
     let risk_service = init_service(&pool);
     let risk = document.map_to_domain();
 
-    let result = web::block(move || risk_service.assess_risk(risk))
-        .await
-        .map_err(|_| CustomError::InternalServerError)?;
+    let result = risk_service.assess_risk(risk).await?;
 
     Ok(HttpResponse::Ok().json(&result))
 }
@@ -41,7 +39,6 @@ pub async fn handle_statics_by_path(path: String, req: HttpRequest) -> Result<Na
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use actix_web::test;
 
