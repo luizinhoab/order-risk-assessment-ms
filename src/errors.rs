@@ -39,3 +39,9 @@ impl From<ValidationErrors> for CustomError {
         CustomError::ValidationError(error.to_string())
     }
 }
+
+impl From<reqwest::Error> for CustomError {
+    fn from(error: reqwest::Error) -> Self {
+        CustomError::IntegrationError(error.to_string())
+    }
+}
