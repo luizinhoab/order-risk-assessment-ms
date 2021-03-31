@@ -1,0 +1,41 @@
+default:
+  image: "rust:latest"
+
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/.cargo
+
+stages:
+  - test
+
+test:tarpaulin:
+  stage: test
+  cache:
+    paths:
+      - $CARGO_HOME
+      - target/
+  before_script:
+    - wget -qO- https://binaries.cockroachdb.com/cockroach-v20.1.0.linux-amd64.tgz | tar -xvz
+    - cp -i cockroach-v20.1.0.linux-amd64/cockroach /usr/local/bin
+    - cargo install cargo-tarpaulin -f
+  script:
+    - rustc --version && cargo --version
+    - cargo tarpaulin -v
+  only:
+    - development
+
+test:cargo:
+  stage: test
+  cache:
+    paths:
+      - .cargo/
+      - target/
+  before_script:
+    - wget -qO- https://binaries.cockroachdb.com/cockroach-v20.1.0.linux-amd64.tgz | tar -xvz
+    - cp -i cockroach-v20.1.0.linux-amd64/cockroach /usr/local/bin
+    - cargo install cargo-tarpaulin -f
+  script:
+    - rustc --version && cargo --version
+    - cargo test --verbose
+  only:
+   - /^(feature|bugfix|hotfix)\/\d+-\w+/
+

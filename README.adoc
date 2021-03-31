@@ -1,0 +1,71 @@
+= Order Risk Assessment
+
+This project simulates an order risk assessment for fictitious ecommerce , in order to evaluate the Rust language and some frameworks like Actix and Diesel as base for microservice development.
+
+
+== Stack
+
+TBD
+
+== Running
+
+=== Development Environment
+
+[.compact]
+* A working setup of `rust` is required, you can check link:https://rustup.rs[https://rustup.rs] for easy setup.
+* Optionally install link:https://docs.docker.com/compose/install/[Docker Compose] for run development database.
+* Install Diesel CLI, check link:http://diesel.rs/guides/getting-started/[Diesel CLI], for database structure.
+
+==== Database
+
+Up Postgres and PgAdmin on development enviroment:
+
+    docker-compose -f docker-compose-dev.yml up -d --build
+
+Run migration to define initial DDL:
+
+    export DATABASE_URL
+     OR
+    echo DATABASE_URL=postgres://username:password@localhost/diesel_demo > .env
+
+    diesel setup
+    diesel migration run
+
+The username and password according with Postgres config on docker-compose-dev.yml case whether using it or what you defined on your another Postgres installation.
+
+==== App
+
+Define enviroment variables host and port for application and run:
+
+    export APP_HOST=0.0.0.0 ; export APP_PORT=8000
+     OR
+    echo APP_HOST=0.0.0.0 \nAPP_PORT=8000 \n RFP_BASE_URL=https://apigateway.serpro.gov.br/consulta-cpf-df-trial/v1/cpf/ \n RFP_API_TOKEN=4e1a1858bdd584fdc077fb7d80f39283 > .env
+
+    cargo run
+
+=== Unit Tests
+
+To run the unit tests will need install CockroachDB as below:
+
+     wget -qO- https://binaries.cockroachdb.com/cockroach-v19.1.4.linux-amd64.tgz | tar -xvz
+
+     cp -i cockroach-v19.1.4.linux-amd64/cockroach /usr/local/bin
+
+And run:
+
+    cargo test
+
+
+=== Integration tests
+
+TBD
+
+== Doc
+
+The API Documentation, based on Open API Specification 3, can be seen on path /doc/risk-api.yaml or at the resource /risk/doc.
+
+When run development environment, you might access: http://0.0.0.0:8000/risk/doc
+
+== Built
+
+link:https://www.rust-lang.org/[Rust]
