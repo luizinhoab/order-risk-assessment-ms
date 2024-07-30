@@ -33,7 +33,7 @@ impl RiskService {
             .await
             .map_err(|_| CustomError::InternalServerError)?;
 
-        Ok(result)
+        Ok(result?)
     }
 }
 
