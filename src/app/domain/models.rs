@@ -105,11 +105,11 @@ pub enum IndividualTaxPayerSituations {
 
 #[derive(Debug, Serialize, Display, Clone)]
 pub enum AssessmentStatus {
-    #[display(fmt = "APPROVED")]
+    #[display("APPROVED")]
     APPROVED,
-    #[display(fmt = "ANALYZING")]
+    #[display("ANALYZING")]
     ANALYZING,
-    #[display(fmt = "REPROVED")]
+    #[display("REPROVED")]
     REPROVED,
 }
 

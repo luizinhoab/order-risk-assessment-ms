@@ -1,17 +1,15 @@
+use once_cell::sync::Lazy;
 use crate::app::domain::models::Risk;
 use regex::Regex;
 use uuid::Uuid;
-use validator::Validate;
-
-lazy_static! {
-    static ref ISO8601: Regex = Regex::new(r"^([1][9][0-9]{2}|[2][0-9]{3})-([1-9]|([0][1-9]|[1][0-2]))-(([0][1-9]|[1][0-9]|[2][0-9]|[3][0-1])) (\d{2}):(\d{2}):(\d{2})$").unwrap();
-}
+use validator::{ValidateRegex};
+static ISO8601_REGEX: Lazy<Regex> = Lazy::new(||{Regex::new(r"^([1][9][0-9]{2}|[2][0-9]{3})-([1-9]|([0][1-9]|[1][0-2]))-(([0][1-9]|[1][0-9]|[2][0-9]|[3][0-1])) (\d{2}):(\d{2}):(\d{2})$").unwrap()});
 
 #[derive(Debug, Clone, Validate, Deserialize, Serialize)]
 pub struct RiskRequestBody {
     pub order_number: i32,
     pub customer_id: Option<Uuid>,
-    #[validate(length(min = 1, message = "Invalid name"))]
+    #[validate(length(min = 4, message = "Invalid name"))]
     pub customer_name: String,
     #[validate(length(min = 11, max = 11, message = "Invalid cpf"))]
     pub customer_cpf: String,
@@ -21,7 +19,7 @@ pub struct RiskRequestBody {
     #[validate(length(min = 4, max = 4, message = "Invalid card expiration date"))]
     pub card_expiration: String,
     pub value: f32,
-    #[validate(regex = "ISO8601")]
+    #[validate(regex(path = *ISO8601_REGEX))]
     pub creation_date_order: String,
 }
 

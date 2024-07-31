@@ -6,13 +6,13 @@ use validator::ValidationErrors;
 
 #[derive(Debug, Serialize, Display)]
 pub enum CustomError {
-    #[display(fmt = "Bad Gateway {}", _0)]
+    #[display("Bad Gateway {}", _0)]
     IntegrationError(String),
 
-    #[display(fmt = "Internal Server Error")]
+    #[display("Internal Server Error")]
     InternalServerError,
 
-    #[display(fmt = "Bad Request: {}", _0)]
+    #[display("Bad Request: {}", _0)]
     ValidationError(String),
 }
 
